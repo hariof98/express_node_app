@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!-- <link rel="stylesheet" href="style.css" /> -->
+        <!-- <script src="script.js" defer></script> -->
+        <title>Node/Express Application</title>
+    </head>
+    <body>
+        <div class="container">
+            <form class="form-class" action="/upload" method="post" enctype="multipart/form-data">
+                <input type="file" name="image" class="image-input" id="fileInput" />
+                <div class="btns">
+                    <button type="submit" class="upload-image">Upload Image</button>
+                    <button type="submit" class="upload-image" onclick="goToRoute()">Retrive Image</button>
+                </div>
+            </form>
+            <div id="status"></div>
+        </div>
+    </body>
+</html>
+
+<script>
+    document.querySelector("form").addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const fileInput = document.querySelector("#fileInput");
+        if (!fileInput.files.length) {
+            document.querySelector("#status").innerHTML = "No file was selected";
+            setTimeout(() => {
+                document.querySelector("#status").innerHTML = "";
+                return;
+            }, 5000);
+            return;
+        }
+
+        // only allows image files with .jpg or .jpeg extensions
+        let extensionCheck = fileInput.files[0].name.split(".").pop();
+        if (extensionCheck === "jpeg" || extensionCheck === "jpg") {
+            const formData = new FormData();
+            formData.append("image", document.querySelector('input[type="file"]').files[0]);
+
+            fetch("uploads", {
+                method: "POST",
+                body: formData,
+            })
+                .then((response) => {
+                    return response.json();
+                })
+                .then((data) => {
+                    /* handle response data - if further processing is needed for visualization */
+                })
+                .catch((err) => {
+                    return err;
+                });
+
+            document.querySelector("#status").innerHTML = "File uploaded successfully";
+            setTimeout(() => {
+                document.querySelector("#status").innerHTML = "";
+                location.reload();
+                return;
+            }, 5000);
+        } else {
+            document.querySelector("#status").innerHTML = "Only .jpeg format is valid";
+            setTimeout(() => {
+                document.querySelector("#status").innerHTML = "";
+                location.reload();
+                return;
+            }, 5000);
+            return;
+        }
+    });
+
+    function goToRoute() {
+        window.location.href = "/view-images";
+    }
+</script>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .upload-image {
+        background-color: #16ab16;
+        color: #ffffff;
+        outline: none;
+        cursor: pointer;
+        width: 200px;
+        height: 80px;
+        border: none;
+        box-shadow: 0 8px 0 #016501;
+        border-width: 0;
+        border-radius: 6px;
+        font-size: 22px;
+    }
+
+    .image-input {
+        width: 200px;
+    }
+
+    .form-class {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    @media (min-width: 768px) {
+        .form-class {
+            align-items: flex-start;
+        }
+    }
+
+    .btns {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    @media (min-width: 768px) {
+        .btns {
+            flex-direction: row;
+        }
+    }
+
+    #status {
+        margin-top: 20px;
+        color: red;
+    }
+</style>
